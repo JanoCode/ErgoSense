@@ -3,6 +3,8 @@ import mediapipe as mp
 import pyautogui
 import time
 
+#elimina las pausas automaticas de pyautogui para evitar retrasos en el movimiento del mouse
+pyautogui.PAUSE = 0
 
 MODEL_PATH = "hand_landmarker.task"
 
