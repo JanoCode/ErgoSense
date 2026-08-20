@@ -1,21 +1,14 @@
 import cv2
 import mediapipe as mp
-import pyautogui
 import time
 
-#elimina las pausas automaticas de pyautogui para evitar retrasos en el movimiento del mouse
-pyautogui.PAUSE = 0
+from gesture_control.cursor.cursor_controller import CursorController
+
 
 MODEL_PATH = "hand_landmarker.task"
 
-# Tamaño del monitor
-screen_width, screen_height = pyautogui.size()
 
-
-# ==========================
-# MEDIAPIPE
-# ==========================
-
+# configuracion de mediapipe
 BaseOptions = mp.tasks.BaseOptions
 HandLandmarker = mp.tasks.vision.HandLandmarker
 HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
@@ -34,20 +27,23 @@ options = HandLandmarkerOptions(
 )
 
 
+# se carga el modelo que detecta la mano
 landmarker = HandLandmarker.create_from_options(options)
 
 
-# ==========================
-# CAMARA
-# ==========================
+# se crea el controlador del mouse
+cursor = CursorController()
 
-camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+
+# se inicializa la camara
+camera = cv2.VideoCapture(0)
 
 if not camera.isOpened():
-    print("ERROR: No se pudo abrir la cámara.")
+    print("ERROR: No se pudo abrir la camara.")
     exit()
 
 
+# se usa para generar el timestamp que necesita mediapipe
 start_time = time.time()
 
 
@@ -58,100 +54,68 @@ print("Presiona ESC para salir")
 
 while True:
 
+    # se obtiene un frame de la camara
     success, frame = camera.read()
 
     if not success:
-        print("ERROR leyendo la cámara")
+        print("ERROR leyendo la camara")
         break
 
 
-    # Efecto espejo
+    # se voltea la imagen para que funcione como espejo
     frame = cv2.flip(frame, 1)
 
     height, width, _ = frame.shape
 
 
-    # OpenCV = BGR
-    # MediaPipe = RGB
+    # mediapipe trabaja con RGB y opencv entrega BGR
     rgb_frame = cv2.cvtColor(
         frame,
         cv2.COLOR_BGR2RGB
     )
 
 
-    # Convertir a formato MediaPipe
+    # se convierte el frame al formato que usa mediapipe
     mp_image = mp.Image(
         image_format=mp.ImageFormat.SRGB,
         data=rgb_frame
     )
 
 
-    # MediaPipe VIDEO necesita timestamp creciente
+    # mediapipe necesita un tiempo creciente cuando se usa en modo video
     timestamp_ms = int(
         (time.time() - start_time) * 1000
     )
 
 
+    # se procesa el frame para buscar una mano
     result = landmarker.detect_for_video(
         mp_image,
         timestamp_ms
     )
 
 
-    # ==========================
-    # MANO DETECTADA
-    # ==========================
-
     if result.hand_landmarks:
 
+        # se toma la primera mano detectada
         hand = result.hand_landmarks[0]
 
 
-        # Landmark 8 = punta del indice
+        # el landmark 8 corresponde a la punta del dedo indice
         index_tip = hand[8]
-
 
         finger_x = index_tip.x
         finger_y = index_tip.y
 
 
-        # ==========================
-        # POSICION DEL MOUSE
-        # ==========================
-
-        mouse_x = int(
-            finger_x * screen_width
-        )
-
-        mouse_y = int(
-            finger_y * screen_height
+        # se mueve el mouse usando la posicion del dedo
+        cursor.move(
+            finger_x,
+            finger_y
         )
 
 
-        # Evitar coordenadas fuera del monitor
-        mouse_x = max(
-            0,
-            min(screen_width - 1, mouse_x)
-        )
-
-        mouse_y = max(
-            0,
-            min(screen_height - 1, mouse_y)
-        )
-
-
-        # Mover mouse
-        pyautogui.moveTo(
-            mouse_x,
-            mouse_y,
-            duration=0
-        )
-
-
-        # ==========================
-        # DIBUJAR LANDMARKS
-        # ==========================
-
+        # se dibujan los puntos de la mano
         for landmark in hand:
 
             x = int(
@@ -172,7 +136,7 @@ while True:
             )
 
 
-        # Punto rojo en el indice
+        # se dibuja un punto mas grande en la punta del indice
         index_x = int(
             finger_x * width
         )
@@ -215,24 +179,19 @@ while True:
         )
 
 
-    # Mostrar cámara
+    # se muestra la camara
     cv2.imshow(
         "GestureControl - ESC para salir",
         frame
     )
 
 
-    # ESC
+    # se cierra el programa al presionar ESC
     if cv2.waitKey(1) & 0xFF == 27:
         break
 
 
-# ==========================
-# CERRAR
-# ==========================
-
+# se liberan los recursos al cerrar
 camera.release()
-
 cv2.destroyAllWindows()
-
 landmarker.close()
