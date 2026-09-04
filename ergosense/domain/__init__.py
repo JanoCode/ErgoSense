@@ -7,6 +7,15 @@ from ergosense.domain.baseline import (
     MetricBaseline,
     PersonalBaseline,
 )
+from ergosense.domain.fatigue import (
+    FatigueEngineConfig,
+    FatigueEvidence,
+    FatigueLevel,
+    FatigueLevelThresholds,
+    FatigueState,
+    FatigueTrend,
+    clamp_score,
+)
 from ergosense.domain.longitudinal import (
     LongitudinalFeatures,
     MetricAggregation,
@@ -28,6 +37,12 @@ __all__ = [
     "AnalysisState",
     "BaselineConfidence",
     "EyeBaseline",
+    "FatigueEngineConfig",
+    "FatigueEvidence",
+    "FatigueLevel",
+    "FatigueLevelThresholds",
+    "FatigueState",
+    "FatigueTrend",
     "FrameObservation",
     "HeadBaseline",
     "LongitudinalFeatures",
@@ -42,4 +57,5 @@ __all__ = [
     "SessionStatus",
     "TimeWindow",
     "TrendDirection",
+    "clamp_score",
 ]
