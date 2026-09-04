@@ -116,5 +116,16 @@ class SessionService:
         self._observations.append(observation)
         return observation
 
+    def add_session_observation(
+        self, observation: SessionObservation
+    ) -> SessionObservation:
+        session = self.require_active_session()
+        if observation.session_id != session.session_id:
+            raise ValueError("observation session_id does not match active session")
+        if observation.captured_at < session.started_at:
+            raise ValueError("observation cannot be earlier than session start")
+        self._observations.append(observation)
+        return observation
+
     def list_observations(self) -> tuple[SessionObservation, ...]:
         return tuple(self._observations)
