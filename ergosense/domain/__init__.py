@@ -22,6 +22,12 @@ from ergosense.domain.fatigue import (
     FatigueTrend,
     clamp_score,
 )
+from ergosense.domain.fatigue_timeline import (
+    FatigueTimeline,
+    FatigueTimelineConfig,
+    FatigueTimelinePoint,
+    FatigueTransition,
+)
 from ergosense.domain.longitudinal import (
     LongitudinalFeatures,
     MetricAggregation,
@@ -51,6 +57,10 @@ __all__ = [
     "FatigueLevelThresholds",
     "FatigueState",
     "FatigueTrend",
+    "FatigueTimeline",
+    "FatigueTimelineConfig",
+    "FatigueTimelinePoint",
+    "FatigueTransition",
     "FrameObservation",
     "HeadBaseline",
     "LongitudinalFeatures",
