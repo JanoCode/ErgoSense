@@ -67,8 +67,8 @@ def test_analyzer_marks_missing_face_without_generating_alerts():
     assert scorer.perclos_calls == []
     assert result.alerts == ()
     assert not result.state.tired
-    assert result.perclos is None
-    assert result.perclos_ready
+    assert result.observation.perclos is None
+    assert not result.observation.perclos_ready
 
 
 def test_analyzer_uses_existing_scorer_outputs_for_results():
@@ -94,8 +94,8 @@ def test_analyzer_uses_existing_scorer_outputs_for_results():
     assert result.state.looking_away
     assert result.state.distracted
     assert result.alerts == ("TIRED", "LOOKING AWAY", "DISTRACTED")
-    assert result.perclos == 0.42
-    assert result.perclos_ready
+    assert result.observation.perclos == 0.42
+    assert result.observation.perclos_ready
 
 
 class FakeSource:
@@ -120,6 +120,14 @@ class FakeSessionService:
 
     def register_observation(self, result):
         self.recorded.append(result)
+
+
+class FakeBaselineService:
+    def __init__(self):
+        self.recorded = []
+
+    def add_observation(self, observation):
+        self.recorded.append(observation)
 
 
 def test_service_adds_processing_time_to_emitted_observation(monkeypatch):
@@ -163,11 +171,13 @@ def test_service_attaches_session_id_and_registers_only_sampled_results(monkeypa
             return True
 
     sampler = Sampler()
+    baseline_service = FakeBaselineService()
     service = LiveMonitoringService(
         source,
         Analyzer(),
         session_service=session_service,
         observation_sampler=sampler,
+        baseline_service=baseline_service,
     )
     monkeypatch.setattr(
         "ergosense.application.live_monitoring.time.perf_counter", lambda: 10.012
@@ -178,3 +188,4 @@ def test_service_attaches_session_id_and_registers_only_sampled_results(monkeypa
     assert result.session_id == session.session_id
     assert sampler.calls == [result.observation.observed_at]
     assert session_service.recorded == [result]
+    assert baseline_service.recorded == [result.observation]

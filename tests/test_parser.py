@@ -4,6 +4,7 @@ from driver_state_detection.parser import (
     DEFAULT_DECAY_FACTOR,
     DEFAULT_MIN_DETECTION_CONFIDENCE,
     DEFAULT_PERCLOS_THRESHOLD,
+    DEFAULT_BASELINE_CALIBRATION_DURATION,
     DEFAULT_ROLL_BAR_LIMIT,
     DEFAULT_SESSION_SAMPLE_INTERVAL,
     get_args,
@@ -31,6 +32,7 @@ def test_runtime_defaults_are_exposed():
     assert args.decay_factor == DEFAULT_DECAY_FACTOR
     assert args.roll_bar_limit == DEFAULT_ROLL_BAR_LIMIT
     assert args.session_sample_interval == DEFAULT_SESSION_SAMPLE_INTERVAL
+    assert args.baseline_calibration_duration == DEFAULT_BASELINE_CALIBRATION_DURATION
 
 
 def test_custom_scoring_and_overlay_options():
@@ -44,6 +46,8 @@ def test_custom_scoring_and_overlay_options():
             "0.8",
             "--yaw-bar-limit",
             "75",
+            "--baseline-calibration-duration",
+            "180",
         ]
     )
 
@@ -51,6 +55,7 @@ def test_custom_scoring_and_overlay_options():
     assert args.perclos_window == 30
     assert args.decay_factor == 0.8
     assert args.yaw_bar_limit == 75
+    assert args.baseline_calibration_duration == 180
 
 
 @pytest.mark.parametrize(
@@ -64,6 +69,7 @@ def test_custom_scoring_and_overlay_options():
         ["--max-faces", "0"],
         ["--roll-thresh", "30", "--roll-bar-limit", "20"],
         ["--session-sample-interval", "0"],
+        ["--baseline-calibration-duration", "0"],
     ],
 )
 def test_invalid_numeric_options_are_rejected(arguments):

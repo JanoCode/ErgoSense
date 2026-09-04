@@ -27,6 +27,7 @@ DEFAULT_PITCH_BAR_LIMIT = 45.0
 DEFAULT_YAW_BAR_LIMIT = 60.0
 DEFAULT_EYE_PREVIEW_SCALE = 300.0
 DEFAULT_SESSION_SAMPLE_INTERVAL = 5.0
+DEFAULT_BASELINE_CALIBRATION_DURATION = 120.0
 
 
 def _finite_float(value):
@@ -282,6 +283,15 @@ def get_args(argv=None):
         help=(
             "Seconds between sampled longitudinal observations "
             f"(default: {DEFAULT_SESSION_SAMPLE_INTERVAL})"
+        ),
+    )
+    session_group.add_argument(
+        "--baseline-calibration-duration",
+        type=_positive_float,
+        default=DEFAULT_BASELINE_CALIBRATION_DURATION,
+        help=(
+            "Seconds used for initial personal baseline calibration "
+            f"(default: {DEFAULT_BASELINE_CALIBRATION_DURATION})"
         ),
     )
 

@@ -44,6 +44,10 @@ class SupportsObservationSampler(Protocol):
     def should_sample(self, observed_at) -> bool: ...
 
 
+class SupportsBaselineService(Protocol):
+    def add_observation(self, observation: FrameObservation) -> Any: ...
+
+
 class SupportsResultAnalyzer(Protocol):
     def analyze(self, observation: FrameObservation) -> AnalysisResult: ...
 
@@ -75,12 +79,15 @@ class LiveFrameAnalyzer:
             return AnalysisResult(
                 observation=observation,
                 state=AnalysisState(),
-                perclos=None,
-                perclos_ready=self.scorer.perclos_ready,
             )
 
         tired, perclos = self.scorer.get_rolling_PERCLOS(
             observation.timestamp, observation.ear
+        )
+        observation = replace(
+            observation,
+            perclos=perclos,
+            perclos_ready=self.scorer.perclos_ready,
         )
         asleep, looking_away, distracted = self.scorer.eval_scores(
             observation.timestamp,
@@ -105,8 +112,6 @@ class LiveFrameAnalyzer:
                 looking_away=looking_away,
                 distracted=distracted,
             ),
-            perclos=perclos,
-            perclos_ready=self.scorer.perclos_ready,
         )
 
 
@@ -120,11 +125,13 @@ class LiveMonitoringService:
         *,
         session_service: SupportsSessionService | None = None,
         observation_sampler: SupportsObservationSampler | None = None,
+        baseline_service: SupportsBaselineService | None = None,
     ):
         self.frame_source = frame_source
         self.analyzer = analyzer
         self.session_service = session_service
         self.observation_sampler = observation_sampler
+        self.baseline_service = baseline_service
 
     def stream(self):
         for sample in self.frame_source.stream():
@@ -148,4 +155,6 @@ class LiveMonitoringService:
             and self.observation_sampler.should_sample(result.observation.observed_at)
         ):
             self.session_service.register_observation(result)
+            if self.baseline_service is not None:
+                self.baseline_service.add_observation(result.observation)
         return result

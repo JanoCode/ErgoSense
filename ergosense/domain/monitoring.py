@@ -16,6 +16,8 @@ class FrameObservation:
     observed_at: datetime
     face_detected: bool
     ear: float | None = None
+    perclos: float | None = None
+    perclos_ready: bool = False
     gaze: float | None = None
     roll: float | None = None
     pitch: float | None = None
@@ -45,5 +47,3 @@ class AnalysisResult:
     state: AnalysisState
     session_id: UUID | None = None
     alerts: tuple[str, ...] = ()
-    perclos: float | None = None
-    perclos_ready: bool = False

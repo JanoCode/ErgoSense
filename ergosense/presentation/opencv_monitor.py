@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import cv2
 
+from ergosense.application.baseline_service import BaselineService
 from ergosense.application.session_service import (
     ObservationSampler,
     SessionService,
@@ -59,6 +60,10 @@ def run_opencv_monitoring(
     analyzer = LiveFrameAnalyzer(scorer)
     session_service = SessionService()
     session = session_service.start_session()
+    baseline_service = BaselineService(
+        calibration_duration=timedelta(seconds=args.baseline_calibration_duration)
+    )
+    baseline_service.start_calibration(session=session)
     sampler = ObservationSampler(
         interval=timedelta(seconds=args.session_sample_interval)
     )
@@ -68,6 +73,7 @@ def run_opencv_monitoring(
         analyzer,
         session_service=session_service,
         observation_sampler=sampler,
+        baseline_service=baseline_service,
     )
     stream = service.stream()
 
@@ -77,8 +83,8 @@ def run_opencv_monitoring(
                 frame,
                 ear=result.observation.ear,
                 gaze=result.observation.gaze,
-                perclos=result.perclos,
-                perclos_ready=result.perclos_ready,
+                perclos=result.observation.perclos,
+                perclos_ready=result.observation.perclos_ready,
                 roll=result.observation.roll,
                 pitch=result.observation.pitch,
                 yaw=result.observation.yaw,
@@ -105,6 +111,7 @@ def run_opencv_monitoring(
                 break
     finally:
         stream.close()
+        baseline_service.finish_calibration()
         if session_service.get_status() is SessionStatus.ACTIVE:
             session_service.end_session()
         cv2.destroyAllWindows()

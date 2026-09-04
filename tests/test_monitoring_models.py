@@ -10,6 +10,8 @@ def test_frame_observation_keeps_runtime_metrics_together():
         observed_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
         face_detected=True,
         ear=0.21,
+        perclos=0.18,
+        perclos_ready=True,
         gaze=0.11,
         roll=-2.0,
         pitch=1.0,
@@ -22,6 +24,8 @@ def test_frame_observation_keeps_runtime_metrics_together():
     assert observation.observed_at.tzinfo is timezone.utc
     assert observation.face_detected
     assert observation.ear == 0.21
+    assert observation.perclos == 0.18
+    assert observation.perclos_ready
     assert observation.processing_ms == 14.2
 
 
@@ -39,8 +43,6 @@ def test_analysis_result_groups_state_alerts_and_perclos():
         state=state,
         session_id=session_id,
         alerts=("TIRED", "DISTRACTED"),
-        perclos=0.3,
-        perclos_ready=True,
     )
 
     assert result.observation is observation
@@ -48,5 +50,3 @@ def test_analysis_result_groups_state_alerts_and_perclos():
     assert result.state.distracted
     assert result.session_id == session_id
     assert result.alerts == ("TIRED", "DISTRACTED")
-    assert result.perclos == 0.3
-    assert result.perclos_ready
