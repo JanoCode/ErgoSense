@@ -1,5 +1,11 @@
 """Domain models for ErgoSense."""
 
+from ergosense.domain.assessment import (
+    AssessmentTrend,
+    FatigueAssessment,
+    WindowAssessmentStatus,
+    WindowFatigueAssessment,
+)
 from ergosense.domain.baseline import (
     BaselineConfidence,
     EyeBaseline,
@@ -35,8 +41,10 @@ from ergosense.domain.session import (
 __all__ = [
     "AnalysisResult",
     "AnalysisState",
+    "AssessmentTrend",
     "BaselineConfidence",
     "EyeBaseline",
+    "FatigueAssessment",
     "FatigueEngineConfig",
     "FatigueEvidence",
     "FatigueLevel",
@@ -57,5 +65,7 @@ __all__ = [
     "SessionStatus",
     "TimeWindow",
     "TrendDirection",
+    "WindowAssessmentStatus",
+    "WindowFatigueAssessment",
     "clamp_score",
 ]
