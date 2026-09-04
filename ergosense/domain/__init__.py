@@ -7,6 +7,15 @@ from ergosense.domain.baseline import (
     MetricBaseline,
     PersonalBaseline,
 )
+from ergosense.domain.longitudinal import (
+    LongitudinalFeatures,
+    MetricAggregation,
+    MetricDeviation,
+    MetricTrend,
+    ProlongedEvent,
+    TimeWindow,
+    TrendDirection,
+)
 from ergosense.domain.monitoring import AnalysisResult, AnalysisState, FrameObservation
 from ergosense.domain.session import (
     MonitoringSession,
@@ -21,9 +30,16 @@ __all__ = [
     "EyeBaseline",
     "FrameObservation",
     "HeadBaseline",
+    "LongitudinalFeatures",
     "MetricBaseline",
+    "MetricAggregation",
+    "MetricDeviation",
+    "MetricTrend",
     "MonitoringSession",
     "PersonalBaseline",
+    "ProlongedEvent",
     "SessionObservation",
     "SessionStatus",
+    "TimeWindow",
+    "TrendDirection",
 ]
