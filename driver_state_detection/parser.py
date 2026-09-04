@@ -26,6 +26,7 @@ DEFAULT_ROLL_BAR_LIMIT = 45.0
 DEFAULT_PITCH_BAR_LIMIT = 45.0
 DEFAULT_YAW_BAR_LIMIT = 60.0
 DEFAULT_EYE_PREVIEW_SCALE = 300.0
+DEFAULT_SESSION_SAMPLE_INTERVAL = 5.0
 
 
 def _finite_float(value):
@@ -271,6 +272,17 @@ def get_args(argv=None):
         type=_positive_float,
         default=DEFAULT_YAW_BAR_LIMIT,
         help=f"Yaw bar half-range in degrees (default: {DEFAULT_YAW_BAR_LIMIT})",
+    )
+
+    session_group = parser.add_argument_group("session sampling")
+    session_group.add_argument(
+        "--session-sample-interval",
+        type=_positive_float,
+        default=DEFAULT_SESSION_SAMPLE_INTERVAL,
+        help=(
+            "Seconds between sampled longitudinal observations "
+            f"(default: {DEFAULT_SESSION_SAMPLE_INTERVAL})"
+        ),
     )
 
     args = parser.parse_args(argv)

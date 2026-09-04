@@ -5,6 +5,7 @@ from driver_state_detection.parser import (
     DEFAULT_MIN_DETECTION_CONFIDENCE,
     DEFAULT_PERCLOS_THRESHOLD,
     DEFAULT_ROLL_BAR_LIMIT,
+    DEFAULT_SESSION_SAMPLE_INTERVAL,
     get_args,
 )
 
@@ -29,6 +30,7 @@ def test_runtime_defaults_are_exposed():
     assert args.perclos_thresh == DEFAULT_PERCLOS_THRESHOLD
     assert args.decay_factor == DEFAULT_DECAY_FACTOR
     assert args.roll_bar_limit == DEFAULT_ROLL_BAR_LIMIT
+    assert args.session_sample_interval == DEFAULT_SESSION_SAMPLE_INTERVAL
 
 
 def test_custom_scoring_and_overlay_options():
@@ -61,6 +63,7 @@ def test_custom_scoring_and_overlay_options():
         ["--min-detection-confidence", "inf"],
         ["--max-faces", "0"],
         ["--roll-thresh", "30", "--roll-bar-limit", "20"],
+        ["--session-sample-interval", "0"],
     ],
 )
 def test_invalid_numeric_options_are_rejected(arguments):

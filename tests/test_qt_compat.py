@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import driver_state_detection.qt_compat as qt_compat
 from driver_state_detection.qt_compat import (
     configure_qt_before_cv2_import,
     configure_qt_fonts_after_cv2_import,
@@ -8,6 +9,7 @@ from driver_state_detection.qt_compat import (
 
 
 def test_wayland_kde6_uses_xcb_without_kde6_theme_state(monkeypatch):
+    monkeypatch.setattr(qt_compat.sys, "platform", "linux")
     monkeypatch.setenv("XDG_SESSION_TYPE", "wayland")
     monkeypatch.setenv("DISPLAY", ":0")
     monkeypatch.setenv("KDE_SESSION_VERSION", "6")
@@ -25,6 +27,10 @@ def test_wayland_kde6_uses_xcb_without_kde6_theme_state(monkeypatch):
 
 def test_missing_wheel_font_directory_is_replaced(monkeypatch, tmp_path):
     missing = tmp_path / "missing-fonts"
+    fonts = tmp_path / "fonts"
+    fonts.mkdir()
+    monkeypatch.setattr(qt_compat.sys, "platform", "linux")
+    monkeypatch.setattr(qt_compat, "SYSTEM_QT_FONT_DIRS", (fonts,))
     monkeypatch.setenv("QT_QPA_FONTDIR", str(missing))
 
     configure_qt_fonts_after_cv2_import()
